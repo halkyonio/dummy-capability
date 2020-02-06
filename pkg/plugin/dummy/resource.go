@@ -9,7 +9,6 @@ import (
 	"halkyon.io/operator-framework"
 	"halkyon.io/operator-framework/plugins/capability"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strings"
 )
 
 var _ capability.PluginResource = &PostgresPluginResource{}
@@ -20,27 +19,13 @@ func NewPluginResource() capability.PluginResource {
 }
 
 func resolver(logger hclog.Logger) capability.TypeInfo {
-	list, err := plugin.Client.PostgresVersions().List(v1.ListOptions{})
+	list, err := plugin.Client.Deployments("").List(v1.ListOptions{})
 	if err != nil {
 		logger.Error(fmt.Sprintf("error retrieving versions: %v", err))
 	}
 	versions := make([]string, 0, len(list.Items))
-	for _, version := range list.Items {
-		if !version.Spec.Deprecated {
-			external := version.Spec.Version
-			internal, ok := versionsMapping[external]
-			if !ok {
-				versions = append(versions, external)
-				versionsMapping[external] = version.Name
-			} else {
-				if strings.Compare(internal, version.Name) < 0 {
-					versionsMapping[external] = version.Name
-				}
-			}
-		}
-	}
 	info := capability.TypeInfo{
-		Type:     kubedbv1.ResourceKindPostgres,
+		Type:     "DummyKind",
 		Versions: versions,
 	}
 	return info
@@ -51,7 +36,7 @@ type PostgresPluginResource struct {
 }
 
 func (p *PostgresPluginResource) GetDependentResourcesWith(owner v1beta12.HalkyonResource) []framework.DependentResource {
-	postgres := NewPostgres(owner)
+	postgres := NewDummy(owner)
 	return []framework.DependentResource{
 		framework.NewOwnedRole(postgres),
 		plugin.NewRoleBinding(postgres),

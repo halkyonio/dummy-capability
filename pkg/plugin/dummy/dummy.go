@@ -6,6 +6,7 @@ import (
 	"halkyon.io/dummy-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
 	apps "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -17,7 +18,7 @@ const (
 )
 
 var (
-	// dummyGVK = kubedbv1.SchemeGroupVersion.WithKind(kubedbv1.ResourceKindPostgres)
+	dummyGVK = metav1.SchemeGroupVersion.WithKind("DummyKind")
 )
 
 type dummy struct {
@@ -34,7 +35,7 @@ func (res dummy) Update(_ runtime.Object) (bool, error) {
 	return false, nil
 }
 
-func NewPostgres(owner v1beta1.HalkyonResource) *dummy {
+func NewDummy(owner v1beta1.HalkyonResource) *dummy {
 	config := framework.NewConfig(dummyGVK)
 	config.CheckedForReadiness = true
 	config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
@@ -48,7 +49,7 @@ func (res dummy) Name() string {
 
 //buildSecret returns the dummy resource
 func (res dummy) Build(empty bool) (runtime.Object, error) {
-	dummy := &kubedbv1.Postgres{}
+	dummy := &apps.Deployment{}
 	if !empty {
 		c := plugin.OwnerAsCapability(res)
 		ls := plugin.GetAppLabels(c.Name)
@@ -57,43 +58,36 @@ func (res dummy) Build(empty bool) (runtime.Object, error) {
 			Namespace: c.Namespace,
 			Labels:    ls,
 		}
-		dummy.Spec = kubedbv1.PostgresSpec{
-			Version:  plugin.GetVersionFrom(c, versionsMapping),
-			Replicas: plugin.ReplicaNumber(1),
-			UpdateStrategy: apps.StatefulSetUpdateStrategy{
-				Type: apps.RollingUpdateStatefulSetStrategyType,
-			},
-			StorageType:       kubedbv1.StorageTypeEphemeral,
-			TerminationPolicy: kubedbv1.TerminationPolicyDelete,
+		dummy.Spec = apps.DeploymentSpec{
+			// TODO
 		}
 
 		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
 		if secret := plugin.GetSecretOrDefault(res, paramsMap); secret != nil {
-			dummy.Spec.DatabaseSecret = secret
-		}
-		if dbNameConfig := plugin.GetDatabaseNameConfigOrNil(dbNameVarName, paramsMap); dbNameConfig != nil {
-			dummy.Spec.PodTemplate = *dbNameConfig
+			// TODO
 		}
 	}
 	return dummy, nil
 }
 
+// Check if the status of the Deployment is ready
 func (res dummy) IsReady(underlying runtime.Object) (ready bool, message string) {
-	psql := underlying.(*kubedbv1.Postgres)
-	ready = psql.Status.Phase == kubedbv1.DatabasePhaseRunning
+	deploy := underlying.(*apps.Deployment)
+	ready = deploy.Status.Conditions[0].Status == v1.ConditionTrue
 	if !ready {
 		msg := ""
-		reason := psql.Status.Reason
+		reason := deploy.Status.Conditions[0].Reason
 		if len(reason) > 0 {
 			msg = ": " + reason
 		}
-		message = fmt.Sprintf("%s is not ready%s", psql.Name, msg)
+		message = fmt.Sprintf("%s is not ready%s", dummy.Name, msg)
 	}
 	return
 }
 
+// Return the name of the Kubernetes Deployment Resources
 func (res dummy) NameFrom(underlying runtime.Object) string {
-	return underlying.(*kubedbv1.Postgres).Name
+	return underlying.(*apps.Deployment).Name
 }
 
 func (res dummy) GetRoleBindingName() string {
@@ -114,18 +108,9 @@ func (res dummy) GetRoleName() string {
 
 func (res dummy) GetDataMap() map[string][]byte {
 	c := plugin.OwnerAsCapability(res)
-	paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
+	_ = plugin.ParametersAsMap(c.Spec.Parameters)
 	return map[string][]byte{
-		dbUserVarName:     []byte(paramsMap[plugin.DbUser]),
-		dbPasswordVarName: []byte(paramsMap[plugin.DbPassword]),
-		dbNameVarName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
-		// TODO : To be reviewed according to the discussion started with issue #75
-		// as we will create another secret when a link will be issued
-		plugin.DbHost:     []byte(plugin.SetDefaultDatabaseHost(c.Name, paramsMap[plugin.DbHost])),
-		plugin.DbPort:     []byte(plugin.SetDefaultDatabasePort(paramsMap[plugin.DbPort])),
-		plugin.DbName:     []byte(plugin.SetDefaultDatabaseName(paramsMap[plugin.DbName])),
-		plugin.DbUser:     []byte((paramsMap[plugin.DbUser])),
-		plugin.DbPassword: []byte(paramsMap[plugin.DbPassword]),
+		// TODO
 	}
 }
 
