@@ -15,7 +15,7 @@ var _ capability.PluginResource = &DummyPluginResource{}
 var versionsMapping = make(map[string]string, 11)
 
 func NewPluginResource() capability.PluginResource {
-	return &DummyPluginResource{capability.NewQueryingSimplePluginResourceStem(v1beta1.DatabaseCategory, resolver)}
+	return &DummyPluginResource{capability.NewQueryingSimplePluginResourceStem(v1beta1.LoggingCategory, resolver)}
 }
 
 // TODO: Check how to get the namespace
