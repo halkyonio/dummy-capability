@@ -1,0 +1,11 @@
+apiVersion: "halkyon.io/v1beta1"
+kind: "Capability"
+metadata:
+  name: "dummy"
+spec:
+  category: "Logging"
+  type: "logrus"
+  version: "1"
+  parameters:
+    - name: "LOGGING_LEVEL"
+      value: "info"
