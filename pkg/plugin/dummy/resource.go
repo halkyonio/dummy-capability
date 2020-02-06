@@ -11,15 +11,16 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var _ capability.PluginResource = &PostgresPluginResource{}
+var _ capability.PluginResource = &DummyPluginResource{}
 var versionsMapping = make(map[string]string, 11)
 
 func NewPluginResource() capability.PluginResource {
-	return &PostgresPluginResource{capability.NewQueryingSimplePluginResourceStem(v1beta1.DatabaseCategory, resolver)}
+	return &DummyPluginResource{capability.NewQueryingSimplePluginResourceStem(v1beta1.DatabaseCategory, resolver)}
 }
 
+// TODO: Check how to get the namespace
 func resolver(logger hclog.Logger) capability.TypeInfo {
-	list, err := plugin.Client.Deployments("").List(v1.ListOptions{})
+	list, err := plugin.Client.Pods("").List(v1.ListOptions{})
 	if err != nil {
 		logger.Error(fmt.Sprintf("error retrieving versions: %v", err))
 	}
@@ -31,16 +32,16 @@ func resolver(logger hclog.Logger) capability.TypeInfo {
 	return info
 }
 
-type PostgresPluginResource struct {
+type DummyPluginResource struct {
 	capability.QueryingSimplePluginResourceStem
 }
 
-func (p *PostgresPluginResource) GetDependentResourcesWith(owner v1beta12.HalkyonResource) []framework.DependentResource {
-	postgres := NewDummy(owner)
+func (p *DummyPluginResource) GetDependentResourcesWith(owner v1beta12.HalkyonResource) []framework.DependentResource {
+	dummy := NewDummy(owner)
 	return []framework.DependentResource{
-		framework.NewOwnedRole(postgres),
-		plugin.NewRoleBinding(postgres),
-		plugin.NewSecret(postgres),
-		postgres,
+		framework.NewOwnedRole(dummy),
+		plugin.NewRoleBinding(dummy),
+		plugin.NewSecret(dummy),
+		dummy,
 	}
 }

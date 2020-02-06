@@ -49,7 +49,7 @@ func (res dummy) Name() string {
 
 //buildSecret returns the dummy resource
 func (res dummy) Build(empty bool) (runtime.Object, error) {
-	dummy := &apps.Deployment{}
+	dummy := &v1.Pod{}
 	if !empty {
 		c := plugin.OwnerAsCapability(res)
 		ls := plugin.GetAppLabels(c.Name)
@@ -58,7 +58,7 @@ func (res dummy) Build(empty bool) (runtime.Object, error) {
 			Namespace: c.Namespace,
 			Labels:    ls,
 		}
-		dummy.Spec = apps.DeploymentSpec{
+		dummy.Spec = v1.PodSpec{
 			// TODO
 		}
 
@@ -72,7 +72,7 @@ func (res dummy) Build(empty bool) (runtime.Object, error) {
 
 // Check if the status of the Deployment is ready
 func (res dummy) IsReady(underlying runtime.Object) (ready bool, message string) {
-	deploy := underlying.(*apps.Deployment)
+	deploy := underlying.(*v1.Pod)
 	ready = deploy.Status.Conditions[0].Status == v1.ConditionTrue
 	if !ready {
 		msg := ""

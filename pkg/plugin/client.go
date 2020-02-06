@@ -6,6 +6,7 @@ import (
 )
 
 var (
-	// Return a Client accessing the Kubernetes Core V1
-	Client = client.NewForConfigOrDie(controllerruntime.GetConfigOrDie()).AppsV1()
+	// Return a Client accessing the Resource tht you will like to handle with your Dummy Capability
+	// Eg. Kubernetes Pod, ...
+	Client = client.NewForConfigOrDie(controllerruntime.GetConfigOrDie()).CoreV1()
 )
