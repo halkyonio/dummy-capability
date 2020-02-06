@@ -9,26 +9,35 @@ import (
 )
 
 var _ capability.PluginResource = &DummyPluginResource{}
-var versionsMapping = make(map[string]string, 11)
 
 func NewPluginResource() capability.PluginResource {
-	return &DummyPluginResource{capability.NewQueryingSimplePluginResourceStem(v1capability.LoggingCategory, resolver)}
+	return &DummyPluginResource{SimplePluginResourceStem: capability.NewSimplePluginResourceStem(v1capability.LoggingCategory, capability.TypeInfo{
+		Type:     "logrus",
+		Versions: []string{"1.0"},
+	})}
 }
 
-// TODO: Check how to get the namespace
-func resolver(logger hclog.Logger) capability.TypeInfo {
-	info := capability.TypeInfo{
-		Type:     v1capability.CapabilityType(dummyType),
-		Versions: []string{dummyVersion},
-	}
-	return info
+func (p *DummyPluginResource) SetLogger(logger hclog.Logger) {
+	p.logger = logger
 }
 
 type DummyPluginResource struct {
-	capability.QueryingSimplePluginResourceStem
+	capability.SimplePluginResourceStem
+	logger hclog.Logger
+}
+
+func (p *DummyPluginResource) GetSupportedCategory() v1capability.CapabilityCategory {
+	p.logger.Info("calling GetSupportedCategory")
+	return p.SimplePluginResourceStem.GetSupportedCategory()
+}
+
+func (p *DummyPluginResource) GetSupportedTypes() []capability.TypeInfo {
+	p.logger.Info("calling GetSupportedTypes")
+	return p.SimplePluginResourceStem.GetSupportedTypes()
 }
 
 func (p *DummyPluginResource) GetDependentResourcesWith(owner v1beta1.HalkyonResource) []framework.DependentResource {
+	p.logger.Info("calling GetDependentResourcesWith")
 	/*dummy := NewDummy(owner)
 	return []framework.DependentResource{
 		framework.NewOwnedRole(dummy),

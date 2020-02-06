@@ -13,14 +13,8 @@ import (
 
 const (
 	// Dummy const
-	key1VarName     = "KEY1"
-	key2VarName     = "KEY2"
-)
-
-var (
-	//dummyGVK = metav1.SchemeGroupVersion.WithKind("DummyKind")
-	dummyType = "logrus"
-	dummyVersion = "1.0"
+	key1VarName = "KEY1"
+	key2VarName = "KEY2"
 )
 
 type dummy struct {
