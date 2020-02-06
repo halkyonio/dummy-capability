@@ -3,9 +3,9 @@ kind: "Capability"
 metadata:
   name: "dummy"
 spec:
-  category: "Logging"
+  category: "logging"
   type: "logrus"
-  version: "1"
+  version: "1.0"
   parameters:
     - name: "LOGGING_LEVEL"
       value: "info"
