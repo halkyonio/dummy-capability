@@ -18,7 +18,9 @@ const (
 )
 
 var (
-	dummyGVK = metav1.SchemeGroupVersion.WithKind("DummyKind")
+	//dummyGVK = metav1.SchemeGroupVersion.WithKind("DummyKind")
+	dummyType = "logrus"
+	dummyVersion = "1.0"
 )
 
 type dummy struct {
@@ -36,10 +38,10 @@ func (res dummy) Update(_ runtime.Object) (bool, error) {
 }
 
 func NewDummy(owner v1beta1.HalkyonResource) *dummy {
-	config := framework.NewConfig(dummyGVK)
-	config.CheckedForReadiness = true
-	config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
-	p := &dummy{framework.NewConfiguredBaseDependentResource(owner, config)}
+	//config := framework.NewConfig(apps.Deployment.GroupVersionKind())
+	//config.CheckedForReadiness = true
+	//config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
+	p := &dummy{framework.NewConfiguredBaseDependentResource(owner, framework.DependentResourceConfig{})}
 	return p
 }
 
