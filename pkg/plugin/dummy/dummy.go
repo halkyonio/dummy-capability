@@ -45,27 +45,27 @@ func (res dummy) Name() string {
 	return framework.DefaultDependentResourceNameFor(res.Owner())
 }
 
-//buildSecret returns the dummy resource
+//Build returns a Pod resource
 func (res dummy) Build(empty bool) (runtime.Object, error) {
-	dummy := &v1.Pod{}
+	pod := &v1.Pod{}
 	if !empty {
 		c := plugin.OwnerAsCapability(res)
 		ls := plugin.GetAppLabels(c.Name)
-		dummy.ObjectMeta = metav1.ObjectMeta{
+		pod.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
 			Labels:    ls,
 		}
-		dummy.Spec = v1.PodSpec{
-			// TODO
-		}
-
-		paramsMap := plugin.ParametersAsMap(c.Spec.Parameters)
-		if secret := plugin.GetSecretOrDefault(res, paramsMap); secret != nil {
-			// TODO
+		pod.Spec = v1.PodSpec{
+			Containers: []v1.Container{
+				v1.Container{
+					Name:  "dummy",
+					Image: "busybox",
+				},
+			},
 		}
 	}
-	return dummy, nil
+	return pod, nil
 }
 
 // Check if the status of the Deployment is ready

@@ -56,7 +56,9 @@ func (res secret) Build(empty bool) (runtime.Object, error) {
 			Namespace: c.Namespace,
 			Labels:    ls,
 		}
-		secret.Data = res.Delegate.GetDataMap()
+		secret.StringData = map[string]string{
+			"foo": "initial",
+		}
 	}
 
 	return secret, nil
