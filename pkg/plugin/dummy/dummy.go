@@ -5,7 +5,6 @@ import (
 	"halkyon.io/api/v1beta1"
 	"halkyon.io/dummy-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
-	apps "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -50,11 +49,9 @@ func (res dummy) Build(empty bool) (runtime.Object, error) {
 	pod := &v1.Pod{}
 	if !empty {
 		c := plugin.OwnerAsCapability(res)
-		ls := plugin.GetAppLabels(c.Name)
 		pod.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
-			Labels:    ls,
 		}
 		pod.Spec = v1.PodSpec{
 			Containers: []v1.Container{
@@ -85,33 +82,14 @@ func (res dummy) IsReady(underlying runtime.Object) (ready bool, message string)
 
 // Return the name of the Kubernetes Deployment Resources
 func (res dummy) NameFrom(underlying runtime.Object) string {
-	return underlying.(*apps.Deployment).Name
-}
-
-func (res dummy) GetRoleBindingName() string {
-	return "use-scc-privileged"
-}
-
-func (res dummy) GetAssociatedRoleName() string {
-	return res.GetRoleName()
-}
-
-func (res dummy) GetServiceAccountName() string {
-	return res.Name()
-}
-
-func (res dummy) GetRoleName() string {
-	return "scc-privileged-role"
+	return underlying.(*v1.Pod).Name
 }
 
 func (res dummy) GetDataMap() map[string][]byte {
 	c := plugin.OwnerAsCapability(res)
-	_ = plugin.ParametersAsMap(c.Spec.Parameters)
-	return map[string][]byte{
-		// TODO
-	}
+	return plugin.ParametersAsMap(c.Spec.Parameters)
 }
 
 func (res dummy) GetSecretName() string {
-	return plugin.DefaultSecretNameFor(res)
+	return res.Owner().GetName() + "-secret"
 }

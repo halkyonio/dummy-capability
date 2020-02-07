@@ -50,15 +50,11 @@ func (res secret) Build(empty bool) (runtime.Object, error) {
 	secret := &v1.Secret{}
 	if !empty {
 		c := OwnerAsCapability(res)
-		ls := GetAppLabels(c.Name)
 		secret.ObjectMeta = metav1.ObjectMeta{
 			Name:      res.Name(),
 			Namespace: c.Namespace,
-			Labels:    ls,
 		}
-		secret.StringData = map[string]string{
-			"foo": "initial",
-		}
+		secret.Data = res.Delegate.GetDataMap()
 	}
 
 	return secret, nil

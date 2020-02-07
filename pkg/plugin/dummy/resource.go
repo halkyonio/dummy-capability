@@ -39,7 +39,6 @@ func (p *DummyPluginResource) GetSupportedTypes() []capability.TypeInfo {
 
 func (p *DummyPluginResource) GetDependentResourcesWith(owner v1beta1.HalkyonResource) []framework.DependentResource {
 	p.logger.Info("calling GetDependentResourcesWith")
-	//dummy := NewDummy(owner)
 	dummy := NewDummy(owner)
 	return []framework.DependentResource{
 		plugin.NewSecret(dummy),
