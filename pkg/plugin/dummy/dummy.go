@@ -37,7 +37,7 @@ func NewDummy(owner v1beta1.HalkyonResource) *dummy {
 	config := framework.NewConfig(podGVK)
 	config.CheckedForReadiness = true
 	config.OwnerStatusField = "PodName"
-	p := &dummy{framework.NewConfiguredBaseDependentResource(owner, framework.DependentResourceConfig{})}
+	p := &dummy{framework.NewConfiguredBaseDependentResource(owner, config)}
 	return p
 }
 
