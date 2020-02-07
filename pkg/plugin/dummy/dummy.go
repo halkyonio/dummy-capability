@@ -17,6 +17,8 @@ const (
 	key2VarName = "KEY2"
 )
 
+var podGVK = v1.SchemeGroupVersion.WithKind("Pod")
+
 type dummy struct {
 	*framework.BaseDependentResource
 }
@@ -32,9 +34,9 @@ func (res dummy) Update(_ runtime.Object) (bool, error) {
 }
 
 func NewDummy(owner v1beta1.HalkyonResource) *dummy {
-	//config := framework.NewConfig(apps.Deployment.GroupVersionKind())
-	//config.CheckedForReadiness = true
-	//config.OwnerStatusField = "PodName" // todo: find a way to compute this as above instead of hardcoding it
+	config := framework.NewConfig(podGVK)
+	config.CheckedForReadiness = true
+	config.OwnerStatusField = "PodName"
 	p := &dummy{framework.NewConfiguredBaseDependentResource(owner, framework.DependentResourceConfig{})}
 	return p
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/hashicorp/go-hclog"
 	v1capability "halkyon.io/api/capability/v1beta1"
 	"halkyon.io/api/v1beta1"
+	"halkyon.io/dummy-capability/pkg/plugin"
 	"halkyon.io/operator-framework"
 	"halkyon.io/operator-framework/plugins/capability"
 )
@@ -38,12 +39,10 @@ func (p *DummyPluginResource) GetSupportedTypes() []capability.TypeInfo {
 
 func (p *DummyPluginResource) GetDependentResourcesWith(owner v1beta1.HalkyonResource) []framework.DependentResource {
 	p.logger.Info("calling GetDependentResourcesWith")
-	/*dummy := NewDummy(owner)
+	//dummy := NewDummy(owner)
+	dummy := NewDummy(owner)
 	return []framework.DependentResource{
-		framework.NewOwnedRole(dummy),
-		plugin.NewRoleBinding(dummy),
 		plugin.NewSecret(dummy),
 		dummy,
-	}*/
-	return nil
+	}
 }
