@@ -11,6 +11,35 @@ and consists in a few steps :
 The plugin allows you to encapsulate 3rd party go libraries, your dependent kubernetes resources
 and to generate a secret by example containing the parameters provided by the Capability.
 
+## For the coder only
+
+As the plugin will handle additional types not currently managed by the `Halkyon` Operator, then it is needed that you review and extend the `go.mod`
+file to add your library handling your `Custom Resource Type`
+
+Next you must create the `Custom Resource` owning the `dependent` resources using the function `Build` declared within the file 
+[example](pkg/plugin/capability/example.go)
+```go
+func (res example) Build(empty bool) (runtime.Object, error) {
+	pod := &v1.Pod{}
+    ...
+    return pod, nil
+}
+```
+**Note**: This function will be called by the `Halkyon` operator when it will call the rpc server
+
+The dependent resources are declared within the body of the function `GetDependentResourcesWith` of the [file](pkg/plugin/capability/resource.go)
+This function returns an array of `DependentResource` containing your owner resources and the dependents (e.g : secret, configmap, ...)
+```go
+func (p *PluginResource) GetDependentResourcesWith(owner v1beta1.HalkyonResource) []framework.DependentResource {
+	p.logger.Info("calling GetDependentResourcesWith")
+	ownerResource := NewOwnerResource(owner)
+	return []framework.DependentResource{
+		ownerResource,
+		plugin.NewSecret(ownerResource),
+	}
+}
+```
+
 ## Build the plugin
 
 To build the plugin, execute the following command within a terminal
