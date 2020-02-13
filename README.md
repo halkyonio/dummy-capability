@@ -53,3 +53,9 @@ and launch the Operator. The plugin will be automatically loaded.
   ```
 - Enjoy !  
 
+## Release 
+
+To release your plugin, configure your github project to use the `.github/workflows/main.yml` file responsible to perform
+the `go releases` using the configuration of the file `.goreleaser.yml`. 
+You can find more information about the goreleaser action [here](https://github.com/goreleaser/goreleaser-action).
+
