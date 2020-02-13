@@ -1,0 +1,11 @@
+apiVersion: halkyon.io/v1beta1
+kind: Capability
+metadata:
+  name: example
+spec:
+  category: logging
+  type: logrus
+  version: "1.0"
+  parameters:
+    - name: LOGGING_LEVEL
+      value: info
