@@ -1,11 +1,15 @@
 # Instructions to create a new plugin
 
-The process to create a new `plugin` able to manage a new capability for the `halkyon` operator is pretty forward 
+The process to create a new [`plugin`](https://github.com/halkyonio/operator-framework/tree/master/plugins) able to manage a new capability for the `halkyon` operator is pretty straightforward 
 and consists in a few steps :
 
 - Git clone the project `https://github.com/halkyonio/plugin-example-capability` and rename it 
-- Rename the `module name` as defined within the `go.mod` file to use your package name
-- Find and replace the `example` word with the name of your `plugin`, resource, ...
+- Rename the `module name` as defined within the `go.mod` file to use your `package name`
+- Find and replace the `example` word with the name of your `plugin` or `resource` for the following files/folders:
+  - Folder : `cmd/example-capability`
+  - File   :`pkg/plugin/capability/example.go`
+  - Resource : `type example struct`
+- Rename the import `halkyon.io/example-capability/...` statement to use your capability path
 - Build and deploy it under the local `plugins` folder of the `halkyon` operator to test it
 
 The plugin allows you to encapsulate 3rd party go libraries, your dependent kubernetes resources
@@ -86,5 +90,5 @@ and launch the Operator. The plugin will be automatically loaded.
 
 To release your plugin, configure your github project to use the `.github/workflows/main.yml` file responsible to perform
 the `go releases` using the configuration of the file `.goreleaser.yml`. 
-You can find more information about the goreleaser action [here](https://github.com/goreleaser/goreleaser-action).
+You can find more information about the goreleaser action [here](https://github.com/goreleaser/goreleaser-action) and [`Halkyon plugin release`](https://github.com/halkyonio/operator-framework/tree/master/plugins#using-plugins-in-halkyon).
 
