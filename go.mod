@@ -1,4 +1,4 @@
-module halkyon.io/dummy-capability
+module halkyon.io/example-capability
 
 go 1.13
 

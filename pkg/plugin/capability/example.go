@@ -1,51 +1,45 @@
-package dummy
+package capability
 
 import (
 	"fmt"
 	"halkyon.io/api/v1beta1"
-	"halkyon.io/dummy-capability/pkg/plugin"
+	"halkyon.io/example-capability/pkg/plugin"
 	framework "halkyon.io/operator-framework"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-const (
-	// Dummy const
-	key1VarName = "KEY1"
-	key2VarName = "KEY2"
-)
-
 var podGVK = v1.SchemeGroupVersion.WithKind("Pod")
 
-type dummy struct {
+type example struct {
 	*framework.BaseDependentResource
 }
 
-func (res dummy) Fetch() (runtime.Object, error) {
+func (res example) Fetch() (runtime.Object, error) {
 	panic("should never be called")
 }
 
-var _ framework.DependentResource = &dummy{}
+var _ framework.DependentResource = &example{}
 
-func (res dummy) Update(_ runtime.Object) (bool, error) {
+func (res example) Update(_ runtime.Object) (bool, error) {
 	return false, nil
 }
 
-func NewDummy(owner v1beta1.HalkyonResource) *dummy {
+func NewOwnerResource(owner v1beta1.HalkyonResource) *example {
 	config := framework.NewConfig(podGVK)
 	config.CheckedForReadiness = true
 	config.OwnerStatusField = "PodName"
-	p := &dummy{framework.NewConfiguredBaseDependentResource(owner, config)}
+	p := &example{framework.NewConfiguredBaseDependentResource(owner, config)}
 	return p
 }
 
-func (res dummy) Name() string {
+func (res example) Name() string {
 	return framework.DefaultDependentResourceNameFor(res.Owner())
 }
 
 //Build returns a Pod resource
-func (res dummy) Build(empty bool) (runtime.Object, error) {
+func (res example) Build(empty bool) (runtime.Object, error) {
 	pod := &v1.Pod{}
 	if !empty {
 		c := plugin.OwnerAsCapability(res)
@@ -56,7 +50,7 @@ func (res dummy) Build(empty bool) (runtime.Object, error) {
 		pod.Spec = v1.PodSpec{
 			Containers: []v1.Container{
 				v1.Container{
-					Name:  "dummy",
+					Name:  "example",
 					Image: "busybox",
 				},
 			},
@@ -66,7 +60,7 @@ func (res dummy) Build(empty bool) (runtime.Object, error) {
 }
 
 // Check if the status of the Deployment is ready
-func (res dummy) IsReady(underlying runtime.Object) (ready bool, message string) {
+func (res example) IsReady(underlying runtime.Object) (ready bool, message string) {
 	deploy := underlying.(*v1.Pod)
 	ready = deploy.Status.Conditions[0].Status == v1.ConditionTrue
 	if !ready {
@@ -75,21 +69,21 @@ func (res dummy) IsReady(underlying runtime.Object) (ready bool, message string)
 		if len(reason) > 0 {
 			msg = ": " + reason
 		}
-		message = fmt.Sprintf("%s is not ready%s", dummy.Name, msg)
+		message = fmt.Sprintf("%s is not ready%s", example.Name, msg)
 	}
 	return
 }
 
 // Return the name of the Kubernetes Deployment Resources
-func (res dummy) NameFrom(underlying runtime.Object) string {
+func (res example) NameFrom(underlying runtime.Object) string {
 	return underlying.(*v1.Pod).Name
 }
 
-func (res dummy) GetDataMap() map[string][]byte {
+func (res example) GetDataMap() map[string][]byte {
 	c := plugin.OwnerAsCapability(res)
 	return plugin.ParametersAsMap(c.Spec.Parameters)
 }
 
-func (res dummy) GetSecretName() string {
+func (res example) GetSecretName() string {
 	return res.Owner().GetName() + "-secret"
 }
