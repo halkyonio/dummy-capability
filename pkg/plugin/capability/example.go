@@ -16,20 +16,36 @@ type example struct {
 	*framework.BaseDependentResource
 }
 
+func (res example) Update(toUpdate runtime.Object) (bool, runtime.Object, error) {
+	return false, toUpdate, nil
+}
+
+func (res example) GetCondition(underlying runtime.Object, err error) *v1beta1.DependentCondition {
+	return framework.DefaultCustomizedGetConditionFor(res, err, underlying, func(underlying runtime.Object, cond *v1beta1.DependentCondition) {
+		pod := underlying.(*v1.Pod)
+		for _, c := range pod.Status.Conditions {
+			if c.Type == v1.PodReady {
+				cond.Type = v1beta1.DependentReady
+				if c.Status != v1.ConditionTrue {
+					cond.Type = v1beta1.DependentPending
+				}
+				cond.Message = c.Message
+				cond.Reason = c.Reason
+			}
+		}
+		return
+	})
+}
+
 func (res example) Fetch() (runtime.Object, error) {
 	panic("should never be called")
 }
 
 var _ framework.DependentResource = &example{}
 
-func (res example) Update(_ runtime.Object) (bool, error) {
-	return false, nil
-}
-
-func NewOwnerResource(owner v1beta1.HalkyonResource) *example {
+func NewOwnerResource(owner framework.SerializableResource) *example {
 	config := framework.NewConfig(podGVK)
 	config.CheckedForReadiness = true
-	config.OwnerStatusField = "PodName"
 	p := &example{framework.NewConfiguredBaseDependentResource(owner, config)}
 	return p
 }
@@ -49,7 +65,7 @@ func (res example) Build(empty bool) (runtime.Object, error) {
 		}
 		pod.Spec = v1.PodSpec{
 			Containers: []v1.Container{
-				v1.Container{
+				{
 					Name:  "example",
 					Image: "busybox",
 				},

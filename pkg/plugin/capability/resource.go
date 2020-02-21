@@ -3,8 +3,6 @@ package capability
 import (
 	"github.com/hashicorp/go-hclog"
 	v1capability "halkyon.io/api/capability/v1beta1"
-	"halkyon.io/api/v1beta1"
-	"halkyon.io/example-capability/pkg/plugin"
 	"halkyon.io/operator-framework"
 	"halkyon.io/operator-framework/plugins/capability"
 )
@@ -14,11 +12,11 @@ var _ capability.PluginResource = &PluginResource{}
 // The PluginResource
 func NewPluginResource() capability.PluginResource {
 	return &PluginResource{SimplePluginResourceStem: capability.NewSimplePluginResourceStem(
-		v1capability.LoggingCategory,
+		"example",
 		capability.TypeInfo{
-		   Type:     "logrus",
-		   Versions: []string{"1.0"},
-	    },
+			Type:     "foo",
+			Versions: []string{"1.0"},
+		},
 	)}
 }
 
@@ -41,11 +39,11 @@ func (p *PluginResource) GetSupportedTypes() []capability.TypeInfo {
 	return p.SimplePluginResourceStem.GetSupportedTypes()
 }
 
-func (p *PluginResource) GetDependentResourcesWith(owner v1beta1.HalkyonResource) []framework.DependentResource {
+func (p *PluginResource) GetDependentResourcesWith(owner framework.SerializableResource) []framework.DependentResource {
 	p.logger.Info("calling GetDependentResourcesWith")
 	ownerResource := NewOwnerResource(owner)
 	return []framework.DependentResource{
 		ownerResource,
-		plugin.NewSecret(ownerResource),
+		framework.NewSecret(ownerResource),
 	}
 }

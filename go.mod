@@ -6,15 +6,15 @@ require (
 	github.com/hashicorp/go-hclog v0.0.0-20180709165350-ff2cf002a8dd
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
-	halkyon.io/api v1.0.0-rc.4.0.20200205214834-8964fac782cc
+	halkyon.io/api v1.0.0-rc.5.0.20200221151218-22a15b77c1e3
 	halkyon.io/operator-framework v1.0.0-beta.4.0.20200207142154-fa01bd8e472c
 	k8s.io/api v0.0.0-20190918195907-bd6ac527cfd2
 	k8s.io/apimachinery v0.17.0
-	k8s.io/client-go v11.0.1-0.20190805182715-88a2adca7e76+incompatible
-	sigs.k8s.io/controller-runtime v0.3.0
 )
 
 replace (
+	halkyon.io/api => ../api
+	halkyon.io/operator-framework => ../operator-framework
 	k8s.io/api => k8s.io/api v0.0.0-20190805182251-6c9aa3caf3d6 // kubernetes-1.14.5
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190315093550-53c4693659ed
 	k8s.io/apimachinery => github.com/kmodules/apimachinery v0.0.0-20190508045248-a52a97a7a2bf
