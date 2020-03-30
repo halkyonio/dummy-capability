@@ -10,10 +10,27 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+// Records the GVK for the underlying type we're interested in working with (here, a Pod)
 var podGVK = v1.SchemeGroupVersion.WithKind("Pod")
 
+// example is a simple, example implementation of DependentResource
 type example struct {
 	*framework.BaseDependentResource
+}
+
+// blank assignment to make sure that our struct properly implements the DependentResource interface
+var _ framework.DependentResource = &example{}
+
+// NewOwnerResource creates a new example instance given the specified owner Resource as a SerializableResource
+func NewOwnerResource(owner framework.SerializableResource) *example {
+	// Create a new, default config with the specified GVK
+	config := framework.NewConfig(podGVK)
+	// Override some of the default configuration if needed, here we want to check this dependent for its
+	// readiness when computing the owner's status
+	config.CheckedForReadiness = true
+	// Create an instance of the struct, properly initializing the embedded BaseDependentResource
+	p := &example{framework.NewConfiguredBaseDependentResource(owner, config)}
+	return p
 }
 
 func (res example) Update(toUpdate runtime.Object) (bool, runtime.Object, error) {
@@ -39,15 +56,6 @@ func (res example) GetCondition(underlying runtime.Object, err error) *v1beta1.D
 
 func (res example) Fetch() (runtime.Object, error) {
 	panic("should never be called")
-}
-
-var _ framework.DependentResource = &example{}
-
-func NewOwnerResource(owner framework.SerializableResource) *example {
-	config := framework.NewConfig(podGVK)
-	config.CheckedForReadiness = true
-	p := &example{framework.NewConfiguredBaseDependentResource(owner, config)}
-	return p
 }
 
 func (res example) Name() string {
@@ -88,11 +96,6 @@ func (res example) IsReady(underlying runtime.Object) (ready bool, message strin
 		message = fmt.Sprintf("%s is not ready%s", example.Name, msg)
 	}
 	return
-}
-
-// Return the name of the Kubernetes Deployment Resources
-func (res example) NameFrom(underlying runtime.Object) string {
-	return underlying.(*v1.Pod).Name
 }
 
 func (res example) GetDataMap() map[string][]byte {

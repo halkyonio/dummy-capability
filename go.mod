@@ -6,8 +6,8 @@ require (
 	github.com/hashicorp/go-hclog v0.0.0-20180709165350-ff2cf002a8dd
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
-	halkyon.io/api v1.0.0-rc.5.0.20200221151218-22a15b77c1e3
-	halkyon.io/operator-framework v1.0.0-beta.4.0.20200207142154-fa01bd8e472c
+	halkyon.io/api v1.0.0-rc.5.0.20200225094354-ffc4920a82c2
+	halkyon.io/operator-framework v1.0.0-beta.6.0.20200327155608-2ac32a75bc98
 	k8s.io/api v0.0.0-20190918195907-bd6ac527cfd2
 	k8s.io/apimachinery v0.17.0
 )

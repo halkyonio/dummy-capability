@@ -29,6 +29,11 @@ type PluginResource struct {
 	logger hclog.Logger
 }
 
+func (p *PluginResource) CheckValidity(owner framework.SerializableResource) []string {
+	p.logger.Info("calling CheckValidity")
+	return []string{}
+}
+
 func (p *PluginResource) GetSupportedCategory() v1capability.CapabilityCategory {
 	p.logger.Info("calling GetSupportedCategory")
 	return p.SimplePluginResourceStem.GetSupportedCategory()
